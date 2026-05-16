@@ -8,6 +8,7 @@ public class SubmitFeedbackRequest {
     private Long sessionId;
     @NotBlank
     private String action;
+    private String extraReason;
 
     public Long getSessionId() {
         return sessionId;
@@ -23,5 +24,13 @@ public class SubmitFeedbackRequest {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getExtraReason() {
+        return extraReason;
+    }
+
+    public void setExtraReason(String extraReason) {
+        this.extraReason = extraReason;
     }
 }

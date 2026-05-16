@@ -33,6 +33,7 @@ public class RecommendationValidator {
             for (JsonNode item : items) {
                 DinnerRecommendationDTO dto = new DinnerRecommendationDTO();
                 dto.setType(truncate(requiredText(item, "type"), 32));
+                dto.setTypeLabel(typeLabel(dto.getType(), truncate(item.path("typeLabel").asText(""), 32)));
                 dto.setName(truncate(requiredText(item, "name"), 128));
                 dto.setReason(truncate(requiredText(item, "reason"), 255));
                 dto.setEstimatedTimeMinutes(Math.max(1, item.path("estimatedTimeMinutes").asInt(20)));
@@ -42,6 +43,7 @@ public class RecommendationValidator {
                 dto.setSteps(readTextArray(item.path("steps"), 8, 120));
                 dto.setSubstitutions(readTextArray(item.path("substitutions"), 5, 120));
                 dto.setTags(readTextArray(item.path("tags"), 8, 32));
+                dto.setCoverImageUrl(truncate(item.path("coverImageUrl").asText(""), 512));
                 dto.setCaution(truncate(item.path("caution").asText(""), 255));
                 if (!REQUIRED_TYPES.contains(dto.getType()) || dto.getSteps().isEmpty()) {
                     throw new BusinessException(ErrorCode.LLM_INVALID_OUTPUT);
@@ -107,5 +109,17 @@ public class RecommendationValidator {
             return "";
         }
         return value.length() <= maxLength ? value : value.substring(0, maxLength);
+    }
+
+    private String typeLabel(String type, String fallback) {
+        if (!fallback.isBlank()) {
+            return fallback;
+        }
+        return switch (type) {
+            case "easy" -> "\u6700\u7701\u4e8b";
+            case "satisfying" -> "\u6700\u6ee1\u8db3";
+            case "healthy" -> "\u6700\u5065\u5eb7";
+            default -> type;
+        };
     }
 }

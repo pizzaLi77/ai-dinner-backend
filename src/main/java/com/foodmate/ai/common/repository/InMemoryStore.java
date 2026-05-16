@@ -1,6 +1,7 @@
 package com.foodmate.ai.common.repository;
 
 import com.foodmate.ai.analytics.AnalyticsEvent;
+import com.foodmate.ai.dinnerplan.TodayDinnerPlanItem;
 import com.foodmate.ai.favorite.Favorite;
 import com.foodmate.ai.feedback.FeedbackEvent;
 import com.foodmate.ai.profile.UserProfile;
@@ -9,6 +10,7 @@ import com.foodmate.ai.recommendation.RecommendationSession;
 import com.foodmate.ai.user.User;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +27,7 @@ public class InMemoryStore {
     private final AtomicLong recommendationId = new AtomicLong(80000);
     private final AtomicLong feedbackId = new AtomicLong(1);
     private final AtomicLong favoriteId = new AtomicLong(1);
+    private final AtomicLong todayDinnerPlanItemId = new AtomicLong(1);
     private final AtomicLong analyticsId = new AtomicLong(1);
 
     private final Map<Long, User> users = new ConcurrentHashMap<>();
@@ -34,6 +37,7 @@ public class InMemoryStore {
     private final Map<Long, Recommendation> recommendations = new ConcurrentHashMap<>();
     private final Map<Long, FeedbackEvent> feedbackEvents = new ConcurrentHashMap<>();
     private final Map<String, Favorite> favorites = new ConcurrentHashMap<>();
+    private final Map<Long, TodayDinnerPlanItem> todayDinnerPlanItems = new ConcurrentHashMap<>();
     private final Map<Long, AnalyticsEvent> analyticsEvents = new ConcurrentHashMap<>();
 
     public User saveUser(User user) {
@@ -85,6 +89,10 @@ public class InMemoryStore {
         return Optional.ofNullable(recommendations.get(id));
     }
 
+    public Optional<RecommendationSession> findSession(Long id) {
+        return Optional.ofNullable(sessions.get(id));
+    }
+
     public List<Recommendation> findRecommendationsByUser(Long userId) {
         return recommendations.values().stream()
                 .filter(item -> item.getUserId().equals(userId))
@@ -128,10 +136,35 @@ public class InMemoryStore {
         favorites.remove(userId + ":" + recommendationId);
     }
 
+    public Optional<Favorite> findFavorite(Long userId, Long favoriteId) {
+        return favorites.values().stream()
+                .filter(item -> item.getUserId().equals(userId) && item.getId().equals(favoriteId))
+                .findFirst();
+    }
+
+    public void removeFavoriteById(Long userId, Long favoriteId) {
+        findFavorite(userId, favoriteId).ifPresent(item -> favorites.remove(item.getUserId() + ":" + item.getRecommendationId()));
+    }
+
     public List<Favorite> findFavorites(Long userId) {
         return new ArrayList<>(favorites.values()).stream()
                 .filter(item -> item.getUserId().equals(userId))
                 .sorted(Comparator.comparing(Favorite::getCreatedAt).reversed())
+                .toList();
+    }
+
+    public TodayDinnerPlanItem saveTodayDinnerPlanItem(TodayDinnerPlanItem item) {
+        if (item.getId() == null) {
+            item.setId(todayDinnerPlanItemId.incrementAndGet());
+        }
+        todayDinnerPlanItems.put(item.getId(), item);
+        return item;
+    }
+
+    public List<TodayDinnerPlanItem> findTodayDinnerPlanItems(Long userId, LocalDate planDate) {
+        return todayDinnerPlanItems.values().stream()
+                .filter(item -> item.getUserId().equals(userId) && item.getPlanDate().equals(planDate))
+                .sorted(Comparator.comparing(TodayDinnerPlanItem::getCreatedAt))
                 .toList();
     }
 

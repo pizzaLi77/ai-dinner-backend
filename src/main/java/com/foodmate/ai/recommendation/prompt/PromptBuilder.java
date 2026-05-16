@@ -76,7 +76,7 @@ public class PromptBuilder {
                 profile.getPreferredCookingTimeMinutes(),
                 profile.getPreferredDifficulty(),
                 profile.getCookingTools(),
-                profile.getHealthGoal()
+                profile.getHealthGoals()
         );
     }
 

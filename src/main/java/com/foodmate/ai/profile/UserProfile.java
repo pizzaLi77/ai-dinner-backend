@@ -17,7 +17,7 @@ public class UserProfile {
     private int preferredCookingTimeMinutes = 20;
     private String preferredDifficulty = "easy";
     private List<String> cookingTools = new ArrayList<>();
-    private String healthGoal = "none";
+    private List<String> healthGoals = new ArrayList<>();
     private String preferenceSummary = "还在了解你的晚餐偏好。";
     private int totalGenerated;
     private int totalLiked;
@@ -122,12 +122,12 @@ public class UserProfile {
         this.cookingTools = cookingTools == null ? new ArrayList<>() : cookingTools;
     }
 
-    public String getHealthGoal() {
-        return healthGoal;
+    public List<String> getHealthGoals() {
+        return healthGoals;
     }
 
-    public void setHealthGoal(String healthGoal) {
-        this.healthGoal = healthGoal;
+    public void setHealthGoals(List<String> healthGoals) {
+        this.healthGoals = healthGoals == null ? new ArrayList<>() : healthGoals;
     }
 
     public String getPreferenceSummary() {

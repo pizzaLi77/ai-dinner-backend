@@ -13,6 +13,7 @@ import com.foodmate.ai.recommendation.RecommendationSession;
 import com.foodmate.ai.recommendation.dto.DinnerRecommendationDTO;
 import com.foodmate.ai.recommendation.dto.GenerateDinnerRequest;
 import com.foodmate.ai.recommendation.dto.GenerateDinnerResponse;
+import com.foodmate.ai.recommendation.dto.ReplaceRecommendationRequest;
 import com.foodmate.ai.recommendation.llm.LlmClient;
 import com.foodmate.ai.recommendation.llm.LlmProperties;
 import com.foodmate.ai.recommendation.llm.RecommendationValidator;
@@ -83,6 +84,41 @@ public class RecommendationService {
         return new GenerateDinnerResponse(session.getId(), profile.getPreferenceSummary(), saved);
     }
 
+    public DinnerRecommendationDTO replace(Long userId, Long recommendationId, ReplaceRecommendationRequest request) {
+        Recommendation original = store.findRecommendation(recommendationId)
+                .filter(item -> item.getUserId().equals(userId))
+                .filter(item -> item.getSessionId().equals(request.getSessionId()))
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT, "recommendation not found"));
+        RecommendationSession session = store.findSession(request.getSessionId())
+                .filter(item -> item.getUserId().equals(userId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT, "session not found"));
+        if (!original.getType().equals(request.getType())) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "type does not match recommendation");
+        }
+        User user = store.findUserById(userId).orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+        UserProfile profile = profileService.requireProfile(userId);
+        GenerateDinnerRequest generateRequest = toRequest(session);
+        List<DinnerRecommendationDTO> candidates;
+        try {
+            String content = llmClient.chat(promptBuilder.systemPrompt(), promptBuilder.build(generateRequest, profile));
+            candidates = validator.validateAndNormalize(content);
+        } catch (Exception exception) {
+            candidates = fallbackFactory.create(generateRequest, profile);
+        }
+        DinnerRecommendationDTO replacement = candidates.stream()
+                .filter(item -> item.getType().equals(request.getType()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT, "unsupported type"));
+        Recommendation saved = store.saveRecommendation(Recommendation.from(userId, user.getOpenid(), session.getId(), replacement));
+        analyticsService.track(user, "recommendation_replace", Map.of(
+                "sessionId", session.getId(),
+                "oldRecommendationId", recommendationId,
+                "newRecommendationId", saved.getId(),
+                "type", request.getType()
+        ));
+        return saved.toDto();
+    }
+
     private void validateRequest(GenerateDinnerRequest request) {
         boolean emptyText = request.getFreeText() == null || request.getFreeText().isBlank();
         boolean emptyTags = request.getSelectedMoods().isEmpty()
@@ -106,5 +142,15 @@ public class RecommendationService {
         } catch (Exception exception) {
             return "{}";
         }
+    }
+
+    private GenerateDinnerRequest toRequest(RecommendationSession session) {
+        GenerateDinnerRequest request = new GenerateDinnerRequest();
+        request.setFreeText(session.getFreeText());
+        request.setSelectedMoods(session.getSelectedMoods());
+        request.setSelectedTastes(session.getSelectedTastes());
+        request.setSelectedTime(session.getSelectedTime());
+        request.setSelectedTools(session.getSelectedTools());
+        return request;
     }
 }

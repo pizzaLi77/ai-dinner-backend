@@ -7,6 +7,7 @@ public class DinnerRecommendationDTO {
     private Long id;
     private Long sessionId;
     private String type;
+    private String typeLabel;
     private String name;
     private String reason;
     private Integer estimatedTimeMinutes;
@@ -16,6 +17,7 @@ public class DinnerRecommendationDTO {
     private List<String> steps = new ArrayList<>();
     private List<String> substitutions = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
+    private String coverImageUrl;
     private String caution = "";
     private RecommendationFeedbackSummary feedbackSummary;
 
@@ -41,6 +43,14 @@ public class DinnerRecommendationDTO {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTypeLabel() {
+        return typeLabel;
+    }
+
+    public void setTypeLabel(String typeLabel) {
+        this.typeLabel = typeLabel;
     }
 
     public String getName() {
@@ -113,6 +123,14 @@ public class DinnerRecommendationDTO {
 
     public void setTags(List<String> tags) {
         this.tags = tags == null ? new ArrayList<>() : tags;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
 
     public String getCaution() {

@@ -40,6 +40,7 @@ public class FallbackRecommendationFactory {
                                           List<String> steps, List<String> substitutions, List<String> tags) {
         DinnerRecommendationDTO dto = new DinnerRecommendationDTO();
         dto.setType(type);
+        dto.setTypeLabel(typeLabel(type));
         dto.setName(name);
         dto.setReason(reason);
         dto.setEstimatedTimeMinutes(minutes);
@@ -51,5 +52,14 @@ public class FallbackRecommendationFactory {
         dto.setTags(tags);
         dto.setCaution("");
         return dto;
+    }
+
+    private String typeLabel(String type) {
+        return switch (type) {
+            case "easy" -> "\u6700\u7701\u4e8b";
+            case "satisfying" -> "\u6700\u6ee1\u8db3";
+            case "healthy" -> "\u6700\u5065\u5eb7";
+            default -> type;
+        };
     }
 }

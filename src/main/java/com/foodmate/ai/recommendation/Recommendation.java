@@ -13,6 +13,7 @@ public class Recommendation {
     private Long userId;
     private String openid;
     private String type;
+    private String typeLabel;
     private String name;
     private String reason;
     private int estimatedTimeMinutes;
@@ -22,11 +23,14 @@ public class Recommendation {
     private List<String> steps;
     private List<String> substitutions;
     private List<String> tags;
+    private String coverImageUrl;
     private String caution;
     private boolean liked;
+    private boolean neutral;
     private boolean disliked;
     private boolean saved;
     private boolean cooked;
+    private boolean addToToday;
     private boolean tooHard;
     private boolean tooLight;
     private boolean tooOily;
@@ -39,6 +43,7 @@ public class Recommendation {
         recommendation.setOpenid(openid);
         recommendation.setSessionId(sessionId);
         recommendation.setType(dto.getType());
+        recommendation.setTypeLabel(dto.getTypeLabel());
         recommendation.setName(dto.getName());
         recommendation.setReason(dto.getReason());
         recommendation.setEstimatedTimeMinutes(dto.getEstimatedTimeMinutes());
@@ -48,6 +53,7 @@ public class Recommendation {
         recommendation.setSteps(dto.getSteps());
         recommendation.setSubstitutions(dto.getSubstitutions());
         recommendation.setTags(dto.getTags());
+        recommendation.setCoverImageUrl(dto.getCoverImageUrl());
         recommendation.setCaution(dto.getCaution());
         recommendation.setCreatedAt(LocalDateTime.now());
         recommendation.setUpdatedAt(LocalDateTime.now());
@@ -59,6 +65,7 @@ public class Recommendation {
         dto.setId(id);
         dto.setSessionId(sessionId);
         dto.setType(type);
+        dto.setTypeLabel(typeLabel == null || typeLabel.isBlank() ? defaultTypeLabel(type) : typeLabel);
         dto.setName(name);
         dto.setReason(reason);
         dto.setEstimatedTimeMinutes(estimatedTimeMinutes);
@@ -68,8 +75,10 @@ public class Recommendation {
         dto.setSteps(steps);
         dto.setSubstitutions(substitutions);
         dto.setTags(tags);
+        dto.setCoverImageUrl(coverImageUrl);
         dto.setCaution(caution);
-        dto.setFeedbackSummary(new RecommendationFeedbackSummary(liked, disliked, saved, cooked, tooHard, tooLight, tooOily));
+        dto.setFeedbackSummary(new RecommendationFeedbackSummary(liked, disliked, saved, cooked, neutral, addToToday,
+                tooHard, tooLight, tooOily));
         return dto;
     }
 
@@ -111,6 +120,14 @@ public class Recommendation {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTypeLabel() {
+        return typeLabel;
+    }
+
+    public void setTypeLabel(String typeLabel) {
+        this.typeLabel = typeLabel;
     }
 
     public String getName() {
@@ -185,6 +202,14 @@ public class Recommendation {
         this.tags = tags;
     }
 
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
+    }
+
     public String getCaution() {
         return caution;
     }
@@ -199,6 +224,14 @@ public class Recommendation {
 
     public void setLiked(boolean liked) {
         this.liked = liked;
+    }
+
+    public boolean isNeutral() {
+        return neutral;
+    }
+
+    public void setNeutral(boolean neutral) {
+        this.neutral = neutral;
     }
 
     public boolean isDisliked() {
@@ -223,6 +256,14 @@ public class Recommendation {
 
     public void setCooked(boolean cooked) {
         this.cooked = cooked;
+    }
+
+    public boolean isAddToToday() {
+        return addToToday;
+    }
+
+    public void setAddToToday(boolean addToToday) {
+        this.addToToday = addToToday;
     }
 
     public boolean isTooHard() {
@@ -263,5 +304,14 @@ public class Recommendation {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    private String defaultTypeLabel(String type) {
+        return switch (type) {
+            case "easy" -> "\u6700\u7701\u4e8b";
+            case "satisfying" -> "\u6700\u6ee1\u8db3";
+            case "healthy" -> "\u6700\u5065\u5eb7";
+            default -> type;
+        };
     }
 }

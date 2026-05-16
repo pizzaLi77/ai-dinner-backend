@@ -10,6 +10,7 @@ public class FeedbackEvent {
     private Long sessionId;
     private Long recommendationId;
     private String action;
+    private String extraReason;
     private String dishName;
     private List<String> dishTags;
     private List<String> dishIngredients;
@@ -61,6 +62,14 @@ public class FeedbackEvent {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getExtraReason() {
+        return extraReason;
+    }
+
+    public void setExtraReason(String extraReason) {
+        this.extraReason = extraReason;
     }
 
     public String getDishName() {

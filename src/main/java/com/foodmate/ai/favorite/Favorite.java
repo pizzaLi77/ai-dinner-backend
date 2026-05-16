@@ -8,11 +8,14 @@ public class Favorite {
     private Long userId;
     private String openid;
     private Long recommendationId;
+    private Long sourceSessionId;
     private String name;
+    private String summary;
     private List<String> tags;
     private int estimatedTimeMinutes;
     private List<String> ingredientsUsed;
     private List<String> steps;
+    private String coverImageUrl;
     private LocalDateTime createdAt;
 
     public Long getId() {
@@ -47,12 +50,28 @@ public class Favorite {
         this.recommendationId = recommendationId;
     }
 
+    public Long getSourceSessionId() {
+        return sourceSessionId;
+    }
+
+    public void setSourceSessionId(Long sourceSessionId) {
+        this.sourceSessionId = sourceSessionId;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public List<String> getTags() {
@@ -85,6 +104,14 @@ public class Favorite {
 
     public void setSteps(List<String> steps) {
         this.steps = steps;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
 
     public LocalDateTime getCreatedAt() {

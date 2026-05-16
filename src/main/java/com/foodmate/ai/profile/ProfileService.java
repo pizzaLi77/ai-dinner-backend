@@ -50,7 +50,7 @@ public class ProfileService {
         profile.setPreferredCookingTimeMinutes(request.getPreferredCookingTimeMinutes());
         profile.setPreferredDifficulty(request.getPreferredDifficulty());
         profile.setCookingTools(request.getCookingTools());
-        profile.setHealthGoal(request.getHealthGoal());
+        profile.setHealthGoals(request.getHealthGoals());
         profile.setPreferenceSummary(buildPreferenceSummary(profile));
         profile.setUpdatedAt(LocalDateTime.now());
         return store.saveProfile(profile);
