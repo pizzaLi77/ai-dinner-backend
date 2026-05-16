@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ai-dinner-backend
+  jackson:
+    default-property-inclusion: non_null
+
+app:
+  auth:
+    secret: ${APP_AUTH_SECRET:dev-change-me-ai-dinner}
+    token-ttl-seconds: 604800
+  wechat:
+    app-id: ${WECHAT_APP_ID:}
+    app-secret: ${WECHAT_APP_SECRET:}
+  llm:
+    provider: ${LLM_PROVIDER:openai}
+    model: ${LLM_MODEL:gpt-4o-mini}
+    api-key: ${LLM_API_KEY:}
+    base-url: ${LLM_BASE_URL:https://api.openai.com/v1/chat/completions}
+    timeout-seconds: ${LLM_TIMEOUT_SECONDS:30}
+    prompt-version: ${LLM_PROMPT_VERSION:v1}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
